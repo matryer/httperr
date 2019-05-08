@@ -21,7 +21,10 @@ func (e httperror) Temporary() bool {
 }
 
 // Check performs additional error checking on HTTP responses.
-// On a non-2xx response, the body will be read and closed.
+// The response and the error from the client are passed in as inputs.
+//  resp, err := httperr.Check(client.Do(req))
+// On a non-2xx response, the body will be read and closed, otherwise
+// you must close the response body as usual.
 func Check(resp *http.Response, err error) (*http.Response, error) {
 	if err != nil {
 		return nil, err
