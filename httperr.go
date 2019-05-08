@@ -24,7 +24,7 @@ func (e httperror) Temporary() bool {
 // On a non-2xx response, the body will be read and closed.
 func Check(resp *http.Response, err error) (*http.Response, error) {
 	if err != nil {
-		return resp, err
+		return nil, err
 	}
 	if resp.StatusCode < 200 || resp.StatusCode >= 400 {
 		defer resp.Body.Close()
@@ -34,7 +34,7 @@ func Check(resp *http.Response, err error) (*http.Response, error) {
 		}
 		return nil, httperror{status: resp.StatusCode, message: strings.TrimSpace(string(body))}
 	}
-	return resp, err
+	return resp, nil
 }
 
 // Temporary checks to see if an error is temporary or whether the request
