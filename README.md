@@ -1,0 +1,2 @@
+# httperr
+HTTP error wrapper
