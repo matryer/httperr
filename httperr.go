@@ -26,6 +26,8 @@ func (e httperror) Temporary() bool {
 // On a non-2xx response, the body will be read and closed, otherwise
 // you must close the response body as usual.
 func Check(resp *http.Response, err error) (*http.Response, error) {
+	// truncateAfter is the maximum length of the body to include.
+	const truncateAfter = 50
 	if err != nil {
 		return nil, err
 	}
@@ -35,7 +37,11 @@ func Check(resp *http.Response, err error) (*http.Response, error) {
 		if err != nil {
 			return nil, httperror{status: resp.StatusCode, message: err.Error()}
 		}
-		return nil, httperror{status: resp.StatusCode, message: strings.TrimSpace(string(body))}
+		s := strings.TrimSpace(string(body))
+		if len(s) > truncateAfter {
+			s = s[:truncateAfter] + "..."
+		}
+		return nil, httperror{status: resp.StatusCode, message: s}
 	}
 	return resp, nil
 }
