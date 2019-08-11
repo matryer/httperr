@@ -1,6 +1,7 @@
 package httperr_test
 
 import (
+	"errors"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -67,8 +68,9 @@ func TestTruncate(t *testing.T) {
 
 func TestTemporary(t *testing.T) {
 	is := is.New(t)
+	status := http.StatusInternalServerError
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusInternalServerError)
+		w.WriteHeader(status)
 		_, err := io.WriteString(w, "try again later\n")
 		is.NoErr(err)
 	}))
@@ -80,4 +82,38 @@ func TestTemporary(t *testing.T) {
 	is.True(err != nil)
 	is.Equal(err.Error(), "500: try again later")
 	is.Equal(httperr.Temporary(err), true)
+
+	normalError := errors.New("some other error")
+	is.Equal(httperr.Temporary(normalError), false)
+}
+
+func TestErrFromClient(t *testing.T) {
+	is := is.New(t)
+	resperr := errors.New("response error")
+	_, err := httperr.Check(nil, resperr)
+	is.Equal(err, resperr)
+}
+
+func TestErrReading(t *testing.T) {
+	is := is.New(t)
+	readerr := errors.New("read error")
+	resp := &http.Response{
+		Body:       errReader{err: readerr},
+		StatusCode: http.StatusBadRequest,
+	}
+	_, err := httperr.Check(resp, nil)
+	is.True(err != nil)
+	is.Equal(err.Error(), `400: read error`)
+}
+
+type errReader struct {
+	err error
+}
+
+func (e errReader) Read(b []byte) (int, error) {
+	return 0, e.err
+}
+
+func (errReader) Close() error {
+	return nil
 }

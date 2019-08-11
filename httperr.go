@@ -7,24 +7,16 @@ import (
 	"strings"
 )
 
-type httperror struct {
-	status  int
-	message string
-}
-
-func (e httperror) Error() string {
-	return fmt.Sprintf("%d: %s", e.status, e.message)
-}
-
-func (e httperror) Temporary() bool {
-	return e.status >= 500
-}
-
 // Check performs additional error checking on HTTP responses.
 // The response and the error from the client are passed in as inputs.
-//  resp, err := httperr.Check(client.Do(req))
-// On a non-2xx response, the body will be read and closed, otherwise
+// If an error is returned the body will be read and closed, otherwise
 // you must close the response body as usual.
+//  resp, err := httperr.Check(client.Do(req))
+//  if err != nil {
+//   	// handle error
+//		return err
+//  }
+//  defer resp.Body.Close()
 func Check(resp *http.Response, err error) (*http.Response, error) {
 	// truncateAfter is the maximum length of the body to include.
 	const truncateAfter = 50
@@ -56,4 +48,17 @@ func Temporary(err error) bool {
 		return tempErr.Temporary()
 	}
 	return false
+}
+
+type httperror struct {
+	status  int
+	message string
+}
+
+func (e httperror) Error() string {
+	return fmt.Sprintf("%d: %s", e.status, e.message)
+}
+
+func (e httperror) Temporary() bool {
+	return e.status >= 500
 }
