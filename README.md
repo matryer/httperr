@@ -9,7 +9,7 @@ network errors and API errors once.
 ## Usage
 
 ```go
-req, err := http.NewRequest(http.MethodGet, srv.URL+"/path", nil)
+req, err := http.NewRequest(http.MethodGet, "/path", nil)
 if err != nil {
 	return errors.Wrap(err, "new request")
 }
