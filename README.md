@@ -17,5 +17,6 @@ resp, err := httperr.Check(client.Do(req))
 if err != nil {
 	return errors.Wrap(err, "HTTP error")
 }
+defer resp.Body.Close()
 // use resp
 ```
