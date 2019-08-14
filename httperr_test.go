@@ -25,6 +25,7 @@ func TestSuccess(t *testing.T) {
 	resp, err := httperr.Check(client.Do(req))
 	is.NoErr(err) // httperr.Check
 	is.Equal(resp.StatusCode, http.StatusOK)
+	is.Equal(httperr.Body(err), nil)
 }
 
 func TestBadRequest(t *testing.T) {
@@ -41,6 +42,7 @@ func TestBadRequest(t *testing.T) {
 	_, err = httperr.Check(client.Do(req))
 	is.True(err != nil)
 	is.Equal(err.Error(), "400: invalid request")
+	is.Equal(string(httperr.Body(err)), "invalid request\n")
 }
 
 func TestTruncate(t *testing.T) {
