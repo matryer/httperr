@@ -1,5 +1,7 @@
 package httperr
 
+// from https://github.com/matryer/httperr
+
 import (
 	"fmt"
 	"io/ioutil"
