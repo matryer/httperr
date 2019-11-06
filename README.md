@@ -1,4 +1,4 @@
-# httperr
+# httperr [![GoDoc](https://godoc.org/github.com/matryer/httperr?status.png)](http://godoc.org/github.com/matryer/httperr) [![Go Report Card](https://goreportcard.com/badge/github.com/matryer/httperr)](https://goreportcard.com/report/github.com/matryer/httperr) [![Build Status](https://travis-ci.org/matryer/httperr.svg?branch=master)](https://travis-ci.org/matryer/httperr)
 
 HTTP error wrapper that returns an error if the HTTP request failed (i.e. 404, 500, etc.) as well as
 if any network issues occurred.
