@@ -53,7 +53,7 @@ func Temporary(err error) bool {
 }
 
 // Body gets the complete response body from the error.
-// If the repsonse provided no body or there was an error reading it,
+// If the response provided no body or there was an error reading it,
 // nil is returned.
 // To get the body of successful requests, access it in the usual way
 // from the http.Response object.
