@@ -1,6 +1,7 @@
 package httperr
 
 // from https://github.com/matryer/httperr
+// license: MIT https://github.com/matryer/httperr/blob/master/LICENSE
 
 import (
 	"fmt"
