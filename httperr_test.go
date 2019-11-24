@@ -49,7 +49,7 @@ func TestTruncate(t *testing.T) {
 	is := is.New(t)
 	const (
 		// truncateAfter is the maximum length of the body to include.
-		truncateAfter = 50
+		truncateAfter = 100
 		// truncatePadding is the status code, colon and dots etc
 		truncatePadding = 8
 	)
@@ -64,7 +64,6 @@ func TestTruncate(t *testing.T) {
 	is.NoErr(err) // http.NewRequest
 	_, err = httperr.Check(client.Do(req))
 	is.True(err != nil)
-	t.Log(err.Error())
 	is.Equal(len(err.Error()), truncateAfter+truncatePadding)
 }
 

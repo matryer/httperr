@@ -4,7 +4,6 @@ package httperr
 // license: MIT https://github.com/matryer/httperr/blob/master/LICENSE
 
 import (
-	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -42,21 +41,6 @@ func Check(resp *http.Response, err error) (*http.Response, error) {
 		return nil, httpErr{status: resp.StatusCode, message: s, body: body}
 	}
 	return resp, nil
-}
-
-// Temporary checks to see if an error is temporary or whether the request
-// will need to change before retrying.
-func Temporary(err error) bool {
-	type temporary interface {
-		Temporary() bool
-	}
-	if insideErr := errors.Unwrap(err); err != nil {
-		err = insideErr
-	}
-	if tempErr, ok := err.(temporary); ok {
-		return tempErr.Temporary()
-	}
-	return false
 }
 
 // Body gets the complete response body from the error.
