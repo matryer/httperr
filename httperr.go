@@ -4,6 +4,7 @@ package httperr
 // license: MIT https://github.com/matryer/httperr/blob/master/LICENSE
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -24,7 +25,7 @@ import (
 // will do that for you.
 func Check(resp *http.Response, err error) (*http.Response, error) {
 	// truncateAfter is the maximum length of the body to include.
-	const truncateAfter = 50
+	const truncateAfter = 100
 	if err != nil {
 		return nil, err
 	}
@@ -32,7 +33,7 @@ func Check(resp *http.Response, err error) (*http.Response, error) {
 		defer resp.Body.Close()
 		body, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
-			return nil, httpErr{status: resp.StatusCode, message: err.Error()}
+			return nil, httpErr{err: err, status: resp.StatusCode, message: err.Error()}
 		}
 		s := strings.TrimSpace(string(body))
 		if len(s) > truncateAfter {
@@ -48,6 +49,9 @@ func Check(resp *http.Response, err error) (*http.Response, error) {
 func Temporary(err error) bool {
 	type temporary interface {
 		Temporary() bool
+	}
+	if insideErr := errors.Unwrap(err); err != nil {
+		err = insideErr
 	}
 	if tempErr, ok := err.(temporary); ok {
 		return tempErr.Temporary()
@@ -68,6 +72,7 @@ func Body(err error) []byte {
 }
 
 type httpErr struct {
+	err     error
 	status  int
 	message string
 	body    []byte
@@ -80,4 +85,11 @@ func (e httpErr) Error() string {
 // Temporary returns true for error status codes above 500.
 func (e httpErr) Temporary() bool {
 	return e.status >= 500
+}
+
+// Unwrap gets the underlying error that was returned when
+// attempting to make this request. May be nil if it was a higher
+// level (i.e. bad status code) error.
+func (e httpErr) Unwrap() error {
+	return e.err
 }
